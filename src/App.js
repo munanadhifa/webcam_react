@@ -4,13 +4,39 @@ import Webcam from "react-webcam";
 
 const WebcamToy = () => {
   const webcamRef = useRef(null);
+  const [filter, setFilter] = useState("");
   const [captureImage, setCaptureImage] = useState([]);
   const [imageCount, setImageCount] = useState(0);
 
   const capture = () => {
     const imageSrc = webcamRef.current.getScreenshot();
-    setCaptureImage([...captureImage, imageSrc]);
+    const filteredImage = applyFilter(imageSrc, filter);
+    setCaptureImage([...captureImage, filteredImage]);
     setImageCount(imageCount + 1);
+  };
+
+  const handleFilter = (newFilter) => {
+    setFilter(newFilter);
+  };
+
+  const applyFilter = (imageSrc, filter) => {
+    if (!filter) {
+      return imageSrc;
+    } else if (filter === "grayscale") {
+      return applyGrayFilter(imageSrc);
+    } else if (filter === "sepia") {
+      return applySepiaFilter(imageSrc);
+    } else {
+      return imageSrc;
+    }
+  };
+
+  const applyGrayFilter = (imageSrc) => {
+    return `filter: grayscale(100%); ${imageSrc}`;
+  };
+
+  const applySepiaFilter = (imageSrc) => {
+    return `filter: grayscale(100%); ${imageSrc}`;
   };
 
   return (
@@ -19,9 +45,14 @@ const WebcamToy = () => {
         <Webcam
           audio={false}
           ref={webcamRef}
-          className={`w-full h-auto  mt-4`}
+          className={`w-full h-auto ${filter}`}
           mirrored={true}
         />
+      </div>
+      <div className="mt-4 flex space-x-4 ">
+        <button onClick={() => handleFilter("")}>None</button>
+        <button onClick={() => handleFilter("grayscale")}>Grayscale</button>
+        <button onClick={() => handleFilter("sepia")}>Sepia</button>
       </div>
       <button
         onClick={capture}
@@ -35,7 +66,7 @@ const WebcamToy = () => {
             key={index}
             src={image}
             alt={`Captured ${index}`}
-            className="mt-4 w-65 h-40 pr-2.5  mb-4"
+            className={`mt-4 w-65 h-40 pr-2.5 mb-4 `}
           />
         ))}
       </div>
